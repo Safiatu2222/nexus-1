@@ -1,0 +1,29 @@
+pipeline {
+    agent any
+    tools {
+        maven 'M2_HOME'
+    }
+    stages {
+        stage('SonarQube Scan') {
+            steps {
+                withSonarQubeEnv('sonarserver') {
+                    sh 'mvn verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=Safiatu2222_week16-geo-code'
+                }
+            }
+        }
+
+        stage('all maven commands') {
+            steps {
+                sh 'mvn clean package test install compile'
+            }
+        }
+        
+        stage('upload artifact') {
+            steps {
+                sh 'curl -u admin:AP486uDG1xZsvSDmocmShUVidvE -T \
+                    target/bio*.jar \
+                    "http://18.212.179.142:8081/artifactory/geoapp/"'
+            }
+        }
+    }
+}
